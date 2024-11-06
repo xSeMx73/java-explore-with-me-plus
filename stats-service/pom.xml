@@ -10,6 +10,13 @@
     <artifactId>stats-service</artifactId>
     <packaging>pom</packaging>
 
+    <name>stats-service</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <modules>
         <module>client</module>
         <module>service</module>
