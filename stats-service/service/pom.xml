@@ -5,7 +5,6 @@
         <groupId>ru.practicum</groupId>
         <artifactId>stats-service</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath />
     </parent>
 
     <artifactId>service</artifactId>
