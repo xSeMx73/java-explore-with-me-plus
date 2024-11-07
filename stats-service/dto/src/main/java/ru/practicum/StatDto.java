@@ -4,9 +4,7 @@ import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public class StatDto {
     private String app;
     private String uri;
