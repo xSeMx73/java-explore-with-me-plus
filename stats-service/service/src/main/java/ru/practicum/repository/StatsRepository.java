@@ -12,35 +12,21 @@ import java.util.List;
 @Repository
 public interface StatsRepository extends JpaRepository<Hit, Long> {
 
+    @Query(value = "SELECT new ru.practicum.StatDto(" +
+            "h.app, h.uri, count(DISTINCT h.ip)) " +
+            "FROM Hit as h " +
+            "WHERE h.timestamp BETWEEN ?1 AND ?2 " +
+            "AND h.uri IN ?3 " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY count(DISTINCT h.ip) DESC")
+    List<StatDto> getWithUniqueIpCount(LocalDateTime start, LocalDateTime end, List<String> uris);
 
-    @Query(value = "select new ru.practicum.StatDto" +
-                   "(h.app, h.uri, count(distinct h.ip)) from Hit as h " +
-                   "where h.timestamp between ?1 and ?2 " +
-                   "and h.uri in ?3 " +
-                   "group by h.app, h.uri " +
-                   "order by count(distinct h.ip) desc")
-    List<StatDto> getWithUriAndUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
-
-
-    @Query(value = "select new ru.practicum.StatDto" +
-                   "(h.app, h.uri, count(h.uri)) from Hit as h " +
-                   "where h.timestamp between ?1 and ?2 " +
-                   "group by h.app, h.uri " +
-                   "order by count(h.uri) desc ")
-    List<StatDto> getWithoutUriAndUniqueIp(LocalDateTime start, LocalDateTime end);
-
-    @Query(value = "select new ru.practicum.StatDto" +
-                   "(h.app, h.uri, count(h.uri)) from Hit as h " +
-                   "where h.timestamp between ?1 and ?2 " +
-                   "and h.uri in ?3 " +
-                   "group by h.app, h.uri " +
-                   "order by count(h.uri) desc ")
-    List<StatDto> getWithUriAndNotUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
-
-    @Query(value = "select new ru.practicum.StatDto" +
-                   "(h.app, h.uri, count(h.uri)) from Hit as h " +
-                   "where h.timestamp between ?1 and ?2 " +
-                   "group by h.app, h.uri " +
-                   "order by count(h.uri) desc ")
-    List<StatDto> getWithoutUriAndNotUniqueIp(LocalDateTime start, LocalDateTime end);
+    @Query(value = "SELECT new ru.practicum.StatDto(" +
+            "h.app, h.uri, count(h.ip)) " +
+            "FROM Hit as h " +
+            "WHERE h.timestamp BETWEEN ?1 AND ?2 " +
+            "AND (?3 IS NULL OR h.uri IN ?3) " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY count(h.ip) DESC")
+    List<StatDto> getWithIpCount(LocalDateTime start, LocalDateTime end, List<String> uris);
 }
