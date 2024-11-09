@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.HitDto;
 import ru.practicum.StatDto;
+import ru.practicum.StatRequestDto;
 import ru.practicum.mapper.HitMapper;
 import ru.practicum.repository.StatsRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,20 +23,11 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<StatDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        if (unique) {
-            if (uris != null) {
-                return statsRepository.getWithUriAndUniqueIp(start, end, uris);
-            } else {
-                return statsRepository.getWithoutUriAndUniqueIp(start, end);
-            }
+    public List<StatDto> getStats(StatRequestDto statDto) {
+        if (statDto.getUnique()) {
+            return statsRepository.getWithUniqueIpCount(statDto.getStart(), statDto.getEnd(), statDto.getUri());
         } else {
-            if (uris != null) {
-                return statsRepository.getWithUriAndNotUniqueIp(start, end, uris);
-            } else {
-                return statsRepository.getWithoutUriAndNotUniqueIp(start, end);
-            }
+            return statsRepository.getWithIpCount(statDto.getStart(), statDto.getEnd(), statDto.getUri());
         }
-
     }
 }
