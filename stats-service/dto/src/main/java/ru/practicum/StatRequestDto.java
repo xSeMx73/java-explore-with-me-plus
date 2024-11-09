@@ -7,15 +7,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HitDto {
-    private String app;
-    private String uri;
-    private String ip;
+public class StatRequestDto {
+
+    private List<String> uri;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime timestamp;
+    private LocalDateTime start;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime end;
+
+    private Boolean unique;
 }
