@@ -3,9 +3,8 @@ package ru.practicum.evm.category.dto;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
-public record CategoryDto(
-
+public record CategoryCreateDto(
         Long id,
-        String name) {
-
+        String name
+) {
 }
