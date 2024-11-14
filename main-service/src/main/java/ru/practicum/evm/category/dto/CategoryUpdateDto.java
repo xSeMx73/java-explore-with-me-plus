@@ -3,7 +3,9 @@ package ru.practicum.evm.category.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-record CategoryUpdateDto(
+public record CategoryUpdateDto(
+
+        long id,
 
         @NotBlank
         @Size(max = 50)
