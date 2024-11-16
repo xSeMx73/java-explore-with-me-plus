@@ -42,8 +42,11 @@ public class UserAdminService {
     public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
         Page<User> users;
         Pageable pageable = PageRequest.of(from, size);
-        if (ids == null) {users = userRepository.findAll(pageable);}
-      else {users = userRepository.findUsers(ids,pageable);}
+        if (ids == null) {
+            users = userRepository.findAll(pageable);
+        } else {
+          users = userRepository.findUsers(ids,pageable);
+      }
     return users.stream().map(userMapper::toUserDto).toList();
     }
 
