@@ -3,13 +3,11 @@ package ru.practicum.evm.user.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
 @Entity
-@ToString
 @Getter
 @Setter
 @Table(name = "users")
