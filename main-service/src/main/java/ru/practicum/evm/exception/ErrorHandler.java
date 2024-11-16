@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.evm.exception.model.ErrorResponse;
 
+import java.util.Map;
+
 
 @Slf4j
 @RestControllerAdvice
@@ -78,5 +80,11 @@ public class ErrorHandler {
         log.info("Получен статус 400 Bad request {}", e.getMessage(), e);
 
         return new ErrorResponse("Некорректное значение параметра: " + e.getMessage());
+    }
+
+    @ExceptionHandler(org.hibernate.exception.ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleConstraintViolationException(org.hibernate.exception.ConstraintViolationException e) {
+        return Map.of("error", e.getMessage());
     }
 }
