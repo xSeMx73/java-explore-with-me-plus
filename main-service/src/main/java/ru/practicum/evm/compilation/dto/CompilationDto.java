@@ -3,11 +3,12 @@ package ru.practicum.evm.compilation.dto;
 import lombok.Builder;
 import ru.practicum.evm.event.dto.EventShortResponseDto;
 
-import java.util.Set;
+import java.util.Collection;
+
 
 @Builder
 public record CompilationDto(
-        Set<EventShortResponseDto> events,
+       Collection<EventShortResponseDto> events,
         Long id,
         boolean pinned,
         String title) {

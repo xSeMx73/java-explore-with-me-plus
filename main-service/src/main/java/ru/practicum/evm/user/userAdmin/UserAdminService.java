@@ -15,7 +15,6 @@ import ru.practicum.evm.user.dto.UserMapper;
 import ru.practicum.evm.user.model.User;
 import ru.practicum.evm.user.repository.UserRepository;
 
-
 import java.sql.SQLException;
 import java.util.List;
 
