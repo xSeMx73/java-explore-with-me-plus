@@ -16,14 +16,11 @@ import ru.practicum.evm.event.enums.StateAction;
 import ru.practicum.evm.event.model.Event;
 import ru.practicum.evm.exception.ConflictException;
 import ru.practicum.evm.exception.NotFoundException;
-import ru.practicum.evm.statistics.service.StatisticsService;
 import ru.practicum.evm.user.model.User;
 import ru.practicum.evm.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,7 +30,6 @@ public class EventServiceImpl implements EventService {
     private final EventRepository repository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final StatisticsService statisticsService;
 
     private static final String EVENT_NOT_FOUND_MESSAGE = "Event not found";
 
@@ -114,32 +110,21 @@ public class EventServiceImpl implements EventService {
                         requestParams.size())
         );
 
-        statisticsService.saveStats(request);
         if (!events.isEmpty()) {
-            LocalDateTime oldestEventPublishedOn = events.stream()
-                    .min(Comparator.comparing(Event::getPublishedOn)).map(Event::getPublishedOn).stream()
-                    .findFirst().orElseThrow();
-            List<String> uris = getListOfUri(events, request.getRequestURI());
-
-            Map<Long, Long> views = statisticsService.getStats(oldestEventPublishedOn, LocalDateTime.now(), uris);
-            events
-                    .stream()
-                    .peek(event -> event.setViews(views.get(event.getId())));
             events = repository.saveAll(events);
         }
+
         return EventMapper.mapToEventDto(events);
     }
 
     @Override
     public EventFullResponseDto publicGetEvent(Long id, HttpServletRequest request) {
         Event event = getEvent(id);
+
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Событие не найдено");
         }
-        statisticsService.saveStats(request);
-        Long views = statisticsService.getStats(
-                event.getPublishedOn(), LocalDateTime.now(), List.of(request.getRequestURI())).get(id);
-        event.setViews(views);
+
         event = repository.save(event);
         return EventMapper.mapEventToEventDto(event);
     }
