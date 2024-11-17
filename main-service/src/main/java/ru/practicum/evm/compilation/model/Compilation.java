@@ -1,17 +1,18 @@
 package ru.practicum.evm.compilation.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.proxy.HibernateProxy;
 import ru.practicum.evm.event.model.Event;
 
+import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "compilations")
 @Getter
@@ -25,7 +26,10 @@ public class Compilation {
     @ManyToMany(fetch = FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
     @ToString.Exclude
-    private Set<Event> events;
+    @JoinTable(name = "compilations_events",
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private Collection<Event> events;
 
     @Column(name = "pinned", nullable = false)
     private Boolean pinned;

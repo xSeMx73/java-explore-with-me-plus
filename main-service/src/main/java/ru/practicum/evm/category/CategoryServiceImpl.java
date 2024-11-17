@@ -79,7 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private Category getCategoryIfExist(long catId) {
+    protected Category getCategoryIfExist(long catId) {
         return categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Категория не найдена"));
     }
