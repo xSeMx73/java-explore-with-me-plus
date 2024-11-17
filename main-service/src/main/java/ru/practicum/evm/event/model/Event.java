@@ -57,12 +57,12 @@ public class Event {
     @PositiveOrZero
     private long participantLimit;
 
-    private boolean paid;
-    private boolean requestModeration;
+    private Boolean paid;
+    private Boolean requestModeration;
 
     private long confirmedRequests;
 
-    private long views;
+    private Long views;
 
     @NotNull
     private LocalDateTime createdOn;

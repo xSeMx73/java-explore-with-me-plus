@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void remove(long categoryId) {
         Category category = getCategoryIfExist(categoryId);
 
-        if (eventRepository.existsByCategoryId(categoryId)) {
+        if (!eventRepository.findByCategoryId(categoryId).isEmpty()) {
             throw new ParameterConflictException("Category", "The category is not empty");
         }
 
@@ -79,7 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private Category getCategoryIfExist(long catId) {
+    protected Category getCategoryIfExist(long catId) {
         return categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Категория не найдена"));
     }

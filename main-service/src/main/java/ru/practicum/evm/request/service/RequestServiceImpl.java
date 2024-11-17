@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.evm.event.EventRepository;
 import ru.practicum.evm.event.enums.EventState;
 import ru.practicum.evm.event.model.Event;
 import ru.practicum.evm.exception.NotFoundException;
@@ -14,24 +15,26 @@ import ru.practicum.evm.request.mapper.RequestMapper;
 import ru.practicum.evm.request.model.Request;
 import ru.practicum.evm.request.repository.RequestRepository;
 import ru.practicum.evm.user.model.User;
+import ru.practicum.evm.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RequestServiceImpl extends RequestService {
+public class RequestServiceImpl implements RequestService {
     private final RequestRepository repository;
-    private final EventService eventService;
-    private final UserService userService;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public RequestDto create(long userId, long eventId) {
         if (!repository.findAllByRequesterIdAndEventIdAndStatusNotLike(userId, eventId,
                 RequestState.CANCELED).isEmpty())
             throw new NotPossibleException("Request already exists");
-        User user = userService.getById(userId);
-        Event event = eventService.getById(eventId);
+        User user = getUser(userId);
+        Event event = getEvent(eventId);
         if (userId == event.getInitiator().getId())
             throw new NotPossibleException("User is Initiator of event");
         if (!event.getState().equals(EventState.PUBLISHED))
@@ -41,7 +44,7 @@ public class RequestServiceImpl extends RequestService {
         Request newRequest = new Request();
         newRequest.setRequester(user);
         newRequest.setEvent(event);
-        if (event.isRequestModeration() && event.getParticipantLimit() != 0) {
+        if (event.getRequestModeration() && event.getParticipantLimit() != 0) {
             newRequest.setStatus(RequestState.PENDING);
         } else {
             newRequest.setStatus(RequestState.CONFIRMED);
@@ -51,7 +54,7 @@ public class RequestServiceImpl extends RequestService {
 
     @Override
     public List<RequestDto> getAllRequestByUserId(final long userId) {
-        userService.getById(userId);
+        getUser(userId);
         return repository.findAllByRequesterId(userId).stream()
                 .map(RequestMapper::mapToRequestDto)
                 .toList();
@@ -60,12 +63,26 @@ public class RequestServiceImpl extends RequestService {
     @Override
     @Transactional
     public RequestDto cancel(final long userId, final long requestId) {
-        userService.getById(userId);
+        getUser(userId);
         Request request = repository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Not found for request id" + requestId));
         if (!request.getRequester().getId().equals(userId))
             throw new NotPossibleException("Request is not by user");
         request.setStatus(RequestState.CANCELED);
         return RequestMapper.mapToRequestDto(repository.save(request));
+    }
+
+    private Event getEvent(long eventId) {
+        Optional<Event> event = eventRepository.findById(eventId);
+        if (event.isEmpty())
+            throw new NotFoundException("События с id = " + eventId + " не существует");
+        return event.get();
+    }
+
+    private User getUser(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty())
+            throw new NotFoundException("Пользователя с id = " + userId + " не существует");
+        return user.get();
     }
 }

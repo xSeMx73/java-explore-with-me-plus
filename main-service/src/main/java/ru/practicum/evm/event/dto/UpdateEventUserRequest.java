@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import ru.practicum.evm.event.enums.StateAction;
 import ru.practicum.evm.event.model.Location;
-import ru.practicum.evm.event.enums.UserAction;
 
 import java.time.LocalDateTime;
 
-record UpdateEventUserRequest(
+public record UpdateEventUserRequest(
 
         @NotBlank
         @Size(min = 3, max = 120)
@@ -35,7 +35,7 @@ record UpdateEventUserRequest(
 
         Boolean paid,
         Boolean requestModeration,
-        UserAction stateAction
+        StateAction stateAction
 ) {
 
 }

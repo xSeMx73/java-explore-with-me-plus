@@ -10,7 +10,7 @@ import ru.practicum.evm.event.validation.ValidEventDate;
 
 import java.time.LocalDateTime;
 
-record NewEventDto(
+public record NewEventDto(
 
         @NotBlank
         @Size(min = 3, max = 120)
