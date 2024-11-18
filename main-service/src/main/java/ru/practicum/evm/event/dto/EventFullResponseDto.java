@@ -10,7 +10,7 @@ import ru.practicum.evm.user.dto.UserShortDto;
 import java.time.LocalDateTime;
 
 @Builder(toBuilder = true)
-record EventFullResponseDto(
+public record EventFullResponseDto(
 
         Long id,
         UserShortDto initiator,

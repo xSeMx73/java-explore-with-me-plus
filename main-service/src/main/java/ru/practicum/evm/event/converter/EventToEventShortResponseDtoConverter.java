@@ -19,7 +19,7 @@ public class EventToEventShortResponseDtoConverter implements Converter<Event, E
     public EventShortResponseDto convert(Event source) {
         return EventShortResponseDto.builder()
                 .id(source.getId())
-                .paid(source.isPaid())
+                .paid(source.getPaid())
                 .title(source.getTitle())
                 .views(source.getViews())
                 .eventDate(source.getEventDate())
