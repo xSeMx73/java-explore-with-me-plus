@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS events
     id                 BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     initiator_id       BIGINT                      NOT NULL,
     title              VARCHAR(120)                NOT NULL,
+    confirmed_requests BIGINT,
     category_id        BIGINT                      NOT NULL,
     event_date         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     lat                REAL,
@@ -38,6 +39,7 @@ CREATE TABLE IF NOT EXISTS events
     created_on         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     published_on       TIMESTAMP WITHOUT TIME ZONE,
     state              VARCHAR(10)                 NOT NULL,
+    views BIGINT,
     CONSTRAINT events_initiator_id_fk FOREIGN KEY (initiator_id) REFERENCES users (id),
     CONSTRAINT events_category_id_fk FOREIGN KEY (category_id) REFERENCES categories (id),
     CONSTRAINT state_values CHECK (state IN ('PENDING', 'PUBLISHED', 'CANCELED'))
@@ -55,10 +57,10 @@ CREATE TABLE IF NOT EXISTS requests
     CONSTRAINT status_values CHECK (status IN ('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELED'))
 );
 
-CREATE TABLE IF NOT EXISTS compilation_event
+CREATE TABLE IF NOT EXISTS compilations_events
 (
     compilation_id BIGINT NOT NULL,
-    event_id       BIGINT NOT NULL,
-    CONSTRAINT compilation_event_compilation_id_fk FOREIGN KEY (compilation_id) REFERENCES compilations (id),
-    CONSTRAINT compilation_event_event_id_fk FOREIGN KEY (event_id) REFERENCES events (id)
+    events_id       BIGINT NOT NULL,
+    CONSTRAINT compilations_events_compilation_id_fk FOREIGN KEY (compilation_id) REFERENCES compilations (id),
+    CONSTRAINT compilations_events_event_id_fk FOREIGN KEY (events_id) REFERENCES events (id)
 );

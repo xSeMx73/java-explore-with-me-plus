@@ -8,12 +8,14 @@ import reactor.core.publisher.Mono;
 
 import java.time.format.DateTimeFormatter;
 
+
 @Service
 public class StatWebClient {
 
-    WebClient client = WebClient.create("http://localhost:8080");
+    WebClient client = WebClient.create("http://localhost:9090");
 
-    public Mono<HitDto> hit(HitDto request) {
+
+    public Mono<HitDto> addHit(HitDto request) {
         return client
                 .post()
                 .uri("/hit")
@@ -23,7 +25,7 @@ public class StatWebClient {
     }
 
     public Flux<StatDto> get(StatRequestDto request) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("http://localhost:8080/stats");
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("http://localhost:9090/stats");
 
         uriBuilder.queryParam("start", request.getStart().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         uriBuilder.queryParam("end", request.getEnd().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -41,4 +43,5 @@ public class StatWebClient {
                 .bodyToFlux(StatDto.class);
 
     }
+
 }
