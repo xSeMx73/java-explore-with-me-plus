@@ -1,5 +1,6 @@
 package ru.practicum.compilation.adminCompilation;
 
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
@@ -40,6 +41,9 @@ public class CompilationAdminService  {
             comp.setEvents(eventRepository.findAllById(newCompilationDto.events()));
         } else if (comp != null) {
             comp.setEvents(new ArrayList<>());
+        }
+        if (comp == null) {
+            throw new NoResultException();
         }
             return converter.convert(compilationRepository.save(comp), CompilationDto.class);
         } catch (PersistenceException e) {
