@@ -30,4 +30,9 @@ public class StatsServiceImpl implements StatsService {
             return statsRepository.getWithIpCount(statDto.getStart(), statDto.getEnd(), statDto.getUri());
         }
     }
+
+    @Override
+    public Long getEventViews(String uri) {
+        return statsRepository.viewsCount(uri);
+    }
 }

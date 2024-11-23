@@ -10,8 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.HitDto;
-import ru.practicum.StatDto;
-import ru.practicum.StatRequestDto;
 import ru.practicum.StatWebClient;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.category.model.Category;
@@ -33,7 +31,6 @@ import ru.practicum.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -129,14 +126,6 @@ public class EventServiceImpl implements EventService {
         return listConverter.convertList(events);
     }
 
-    private Long extractId(String uri) {
-        int firstSlashIndex = uri.indexOf("/");
-       String result = uri.substring(firstSlashIndex + 1);
-       int secondSlashIndex = result.indexOf("/");
-       result = result.substring(0, secondSlashIndex);
-    return Long.parseLong(result);
-    }
-
     @Override
     public EventFullResponseDto publicGetEvent(Long id, HttpServletRequest request) {
         Event event = getEvent(id);
@@ -144,22 +133,13 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Событие не найдено");
         }
-
-
         hit(request.getRemoteAddr(),request.getRequestURI());
 
-        StatRequestDto requestDto = new StatRequestDto();
-        requestDto.setUri(Collections.singletonList(request.getRequestURI()));
-        requestDto.setUnique(true);
-        requestDto.setStart(LocalDateTime.of(1998,6,7, 0,0, 0));
-        requestDto.setEnd(LocalDateTime.now());
-        StatDto stat = statisticService.get(requestDto).blockFirst();
-        if (stat != null && stat.getHits() != null) {
-            event.setViews(stat.getHits());
+        Long views = statisticService.getEventViews(request.getRequestURI());
+        if (views != null) {
+            event.setViews(views);
         }
         event = repository.save(event);
-
-
         return converter.convert(event, EventFullResponseDto.class);
     }
 

@@ -37,10 +37,17 @@ public class StatController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
             @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") boolean unique) {
+        log.info("Запрос статистики");
         if (start.isAfter(end)) {
             throw new ValidationException("Неверные параметры запроса");
         }
         StatRequestDto dto = new StatRequestDto(uris, start, end, unique);
         return ResponseEntity.ok().body(statsService.getStats(dto));
+    }
+
+    @GetMapping("/stats/event")
+    public Long getEventViews(@RequestParam String uri) {
+        log.info("Запрос количества просмотров события {}", uri);
+        return statsService.getEventViews(uri);
     }
 }
