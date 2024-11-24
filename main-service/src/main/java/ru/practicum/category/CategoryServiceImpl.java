@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void remove(long categoryId) {
-        Category category = getCategoryIfExist(categoryId);
+        getCategoryIfExist(categoryId);
 
         if (!eventRepository.findByCategoryId(categoryId).isEmpty()) {
             throw new ParameterConflictException("Category", "The category is not empty");

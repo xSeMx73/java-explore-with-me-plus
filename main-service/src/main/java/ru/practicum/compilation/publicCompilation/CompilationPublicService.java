@@ -24,7 +24,7 @@ public class CompilationPublicService {
 
     public CompilationDto getCompilationById(Long compId) {
         return converter.convert(compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Подборка c с таким ID не найдена или недоступна")),
+                .orElseThrow(() -> new NotFoundException("Подборка c ID: " + compId + " не найдена или недоступна")),
                 CompilationDto.class);
     }
 
@@ -34,7 +34,9 @@ public class CompilationPublicService {
 
         compilations = compilationRepository.findCompilations(pinned,pageable);
 
-        return compilations.stream().map(comp -> converter.convert(comp, CompilationDto.class)).toList();
+        return compilations.stream()
+                .map(comp -> converter.convert(comp, CompilationDto.class))
+                .toList();
     }
 
     }

@@ -46,12 +46,14 @@ public class UserAdminService {
         } else {
           users = userRepository.findUsers(ids,pageable);
       }
-    return users.stream().map(userMapper::toUserDto).toList();
+    return users.stream()
+            .map(userMapper::toUserDto)
+            .toList();
     }
 
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID: " + userId + " не найден"));
         userRepository.delete(user);
     }
 }

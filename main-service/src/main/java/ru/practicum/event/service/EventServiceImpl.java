@@ -131,7 +131,7 @@ public class EventServiceImpl implements EventService {
         Event event = getEvent(id);
 
         if (event.getState() != EventState.PUBLISHED) {
-            throw new NotFoundException("Событие не найдено");
+            throw new NotFoundException("Событие c ID: " + id + " не найдено");
         }
         hit(request.getRemoteAddr(),request.getRequestURI());
 
@@ -153,7 +153,7 @@ public class EventServiceImpl implements EventService {
 
         for (Long requestId : request.getRequestIds()) {
             Request newRequest = requestRepository
-                    .findById(requestId).orElseThrow(() -> new NotFoundException("Запрос не найден"));
+              .findById(requestId).orElseThrow(() -> new NotFoundException("Запрос c ID: " + requestId + " не найден"));
             processRequestStatus(request.getStatus(), event, newRequest, confirmedReqs, canceledReqs);
         }
 
@@ -288,7 +288,7 @@ public class EventServiceImpl implements EventService {
     private User getUser(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new NotFoundException("Пользователь не найден");
+            throw new NotFoundException("Пользователь c ID: " + userId + " не найден");
         }
         return user.get();
     }
@@ -296,7 +296,7 @@ public class EventServiceImpl implements EventService {
     private Category getCategory(Long categoryId) {
         Optional<Category> category = categoryRepository.findById(categoryId);
         if (category.isEmpty()) {
-            throw new NotFoundException("Категория не найдена");
+            throw new NotFoundException("Категория c ID: " + categoryId + " не найдена");
         }
         return category.get();
     }
