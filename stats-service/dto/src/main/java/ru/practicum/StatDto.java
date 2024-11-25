@@ -1,7 +1,9 @@
 package ru.practicum;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -10,5 +12,5 @@ import lombok.*;
 public class StatDto {
     private String app;
     private String uri;
-    private long hits;
+    private Long hits;
 }

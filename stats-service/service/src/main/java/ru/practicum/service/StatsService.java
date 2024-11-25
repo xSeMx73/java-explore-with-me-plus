@@ -11,4 +11,6 @@ public interface StatsService {
     HitDto hit(HitDto hitDto);
 
     List<StatDto> getStats(StatRequestDto statDto);
+
+    Long getEventViews(String uri);
 }

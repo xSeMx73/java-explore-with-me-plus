@@ -42,7 +42,6 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/main-db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
-      - SERVER_PORT=8080
       - STATS_URL=http://stats-server:9090/
     restart: on-failure
 
