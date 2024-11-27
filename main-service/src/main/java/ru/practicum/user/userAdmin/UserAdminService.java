@@ -56,4 +56,8 @@ public class UserAdminService {
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID: " + userId + " не найден"));
         userRepository.delete(user);
     }
+
+    public User getUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователя не существует"));
+    }
 }

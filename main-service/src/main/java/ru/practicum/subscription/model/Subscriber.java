@@ -1,11 +1,15 @@
 package ru.practicum.subscription.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "subscribers")
-@Data
+@ToString
+@Getter
+@Setter
 public class Subscriber {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

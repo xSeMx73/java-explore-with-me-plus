@@ -16,9 +16,8 @@ import ru.practicum.subscription.model.Subscriber;
 import ru.practicum.subscription.repository.BlackListRepository;
 import ru.practicum.subscription.repository.SubscriberRepository;
 import ru.practicum.user.model.User;
-import ru.practicum.user.repository.UserRepository;
+import ru.practicum.user.userAdmin.UserAdminService;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +27,7 @@ import java.util.Optional;
 public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriberRepository subscriberRepository;
     private final BlackListRepository blackListRepository;
-    private final UserRepository userRepository;
+    private final UserAdminService userService;
     private final EventService eventService;
     private final EventToEventShortResponseDtoConverter listConverter;
     private final SubscriptionMapper subscriptionMapper;
@@ -37,17 +36,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public void addSubscriber(Subscriber subscriber) {
         log.debug("Проверка пользователя на существование в БД {}", subscriber.getUserId());
         User userSibscriber = getUser(subscriber.getUserId(), subscriber.getSubscriber());
-        if (subscriberRepository
-                .findByUserIdAndSubscriber(subscriber.getUserId(), subscriber.getSubscriber())
-                .isPresent()) {
-            throw new ConditionsNotMetException("Пользователь уже в черном списке на данного человека");
-        }
-        if (blackListRepository
-                .findByUserIdAndBlockUser(subscriber.getUserId(), subscriber.getSubscriber())
-                .isPresent()) {
-            throw new ConditionsNotMetException("Пользователь находиться в черном списке и не может подписаться");
-        }
-        log.info("Сохранение пользователя в подписчиках {} {}", userSibscriber.getName(), userSibscriber.getEmail());
+        checkUserBD(subscriber.getUserId(), subscriber.getSubscriber());
+        log.info("POST Запрос Сохранение пользователя в подписчиках {} {}", userSibscriber.getName(), userSibscriber.getEmail());
         subscriberRepository.save(subscriber);
     }
 
@@ -55,17 +45,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public void addBlacklist(BlackList blackList) {
         log.debug("Проверка пользователей на существование в БД {}", blackList.getUserId());
         User blockUser = getUser(blackList.getUserId(), blackList.getBlackList());
-        if (blackListRepository
-                .findByUserIdAndBlockUser(blackList.getUserId(), blackList.getBlackList())
-                .isPresent()) {
-            throw new ConditionsNotMetException("Пользователь уже в черном списке на данного человека");
-        }
-        if (subscriberRepository
-                .findByUserIdAndSubscriber(blackList.getUserId(), blackList.getBlackList())
-                .isPresent()) {
-            throw new ConditionsNotMetException("Пользователь находиться в подписчиках и не может быть добавлен в черный список");
-        }
-        log.info("Сохранение пользователя в черный список {} {}", blockUser.getName(), blockUser.getEmail());
+        checkUserBD(blackList.getUserId(), blackList.getBlackList());
+        log.info("POST Запрос Сохранение пользователя в черный список {} {}", blockUser.getName(), blockUser.getEmail());
         blackListRepository.save(blackList);
     }
 
@@ -79,7 +60,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .findFirst();
 
         if (subscribed.isPresent()) {
-            subscriberRepository.delete(subscriber);
+            log.info("DELETE Запрос на удаление пользователя из подписок выполнено");
+            subscriberRepository.deleteByUserIdAndSubscriber(subscriber.getUserId(), subscriber.getSubscriber());
         } else {
             throw new NotFoundException("Пользователя нет в подписчиках");
         }
@@ -95,7 +77,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .findFirst();
 
         if (blackLists.isPresent()) {
-            blackListRepository.delete(blackList);
+            log.info("DELETE Запрос на удаление пользователя из черного списка выполнено");
+            blackListRepository.deleteByUserIdAndBlockUser(blackList.getUserId(), blackList.getBlackList());
         } else {
             throw new NotFoundException("Пользователя нет в черном листе");
         }
@@ -103,14 +86,17 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionDto getSubscribers(long userId) {
+        log.debug("Получение списка ID пользователей на которых подписаны");
         List<Subscriber> subscriptions = subscriberRepository.findAllByUserId(userId);
-        System.out.println(subscriptions.getFirst());
+        log.info("GET Запрос на получение списка подписок пользователя выполнен {}", subscriptions);
         return subscriptionMapper.SubscribertoSubscriptionDto(subscriptions);
     }
 
     @Override
     public SubscriptionDto getBlacklists(long userId) {
-        Collection<BlackList> blackList = blackListRepository.findAllByUserId(userId);
+        log.debug("Получение списка ID пользователей на которые в черном списке");
+        List<BlackList> blackList = blackListRepository.findAllByUserId(userId);
+        log.info("GET Запрос на получение списка черного списка пользователя выполнен {}", blackList);
         return subscriptionMapper.BlackListSubscriptionDto(blackList);
     }
 
@@ -126,7 +112,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     private User getUser(long userId, long subscriberId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователя не существует"));
-        return userRepository.findById(subscriberId).orElseThrow(() -> new NotFoundException("Пользователя не существует"));
+        userService.getUser(userId);
+        return userService.getUser(subscriberId);
+    }
+
+    private void checkUserBD(long userId, long subscriberId) {
+        if (subscriberRepository
+                .findByUserIdAndSubscriber(userId, subscriberId)
+                .isPresent()) {
+            throw new ConditionsNotMetException("Пользователь уже в списке подписчиков на данного человека");
+        }
+        if (blackListRepository
+                .findByUserIdAndBlockUser(userId, subscriberId)
+                .isPresent()) {
+            throw new ConditionsNotMetException("Пользователь находиться в черном списке и не может подписаться");
+        }
     }
 }

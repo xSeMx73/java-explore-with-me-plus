@@ -1,9 +1,9 @@
 package ru.practicum.subscription.controller;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventShortResponseDto;
 import ru.practicum.exception.ConditionsNotMetException;
@@ -17,13 +17,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{userId}")
 @RequiredArgsConstructor
+@Slf4j
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/subscriptions/{subscriberId}")
     public void addSubscribe(@PathVariable("userId") @Positive @NotNull long userId,
                              @PathVariable("subscriberId") @Positive @NotNull long subscriberId) {
-        System.out.println("Request to add subscriber " + subscriberId + " to user " + userId);
+        if (userId == subscriberId) {
+            throw new ConditionsNotMetException("Пользователь не может подписаться сам на себя");
+        }
+        log.info("POST Запрос на добавление подписки на человека >>");
         Subscriber subscriber = new Subscriber();
         subscriber.setUserId(userId);
         subscriber.setSubscriber(subscriberId);
@@ -31,11 +35,13 @@ public class SubscriptionController {
     }
 
     @PostMapping("black-list/{blackListId}")
-    public void addBlackList(@PathVariable("userId") @NotBlank long userId,
-                             @PathVariable("blackListId") @NotBlank long blackListId) {
+    public void addBlackList(@PathVariable("userId") @Positive @NotNull long userId,
+                             @PathVariable("blackListId") @Positive @NotNull long blackListId) {
+        log.info("POST Запрос на добавление человека в черный список >>");
         if (userId == blackListId) {
-            throw new ConditionsNotMetException("Пользователь не может подписаться сам на себя");
+            throw new ConditionsNotMetException("Пользователь не может добавить в черный список сам на себя");
         }
+
         BlackList blackList = new BlackList();
         blackList.setUserId(userId);
         blackList.setBlackList(blackListId);
@@ -44,33 +50,44 @@ public class SubscriptionController {
     }
 
     @DeleteMapping("/subscriptions/{subscriberId}")
-    public void removeSubscriber(@PathVariable("userId") @NotBlank long userId,
-                                 @PathVariable("subscriberId") @NotBlank long subscriberId) {
+    public void removeSubscriber(@PathVariable("userId") @Positive @NotNull long userId,
+                                 @PathVariable("subscriberId") @Positive @NotNull long subscriberId) {
+        log.info("DELETE Запрос на удаление человека из списка подписок >>");
         Subscriber subscriber = new Subscriber();
         subscriber.setUserId(userId);
         subscriber.setSubscriber(subscriberId);
     }
 
     @DeleteMapping("/black-list/{blackListId}")
-    public void removeBlackList(@PathVariable("userId") @NotBlank long userId,
-                                @PathVariable("blackListId") @NotBlank long blackListId) {
+    public void removeBlackList(@PathVariable("userId") @Positive @NotNull long userId,
+                                @PathVariable("blackListId") @Positive @NotNull long blackListId) {
+        log.info("DELETE Запрос на удаление человека из черного списка >>");
         BlackList blackList = new BlackList();
         blackList.setUserId(userId);
         blackList.setBlackList(blackListId);
     }
 
     @GetMapping("/subscriptions")
-    public SubscriptionDto getListSubscriptions(@PathVariable("userId") @Positive long userId) {
-        return subscriptionService.getSubscribers(userId);
+    public SubscriptionDto getListSubscriptions(@PathVariable("userId") @Positive @NotNull long userId) {
+        log.info("GET Запрос на получение списка подписок человека с ID {}", userId);
+        SubscriptionDto subscriptionDto = subscriptionService.getSubscribers(userId);
+        log.info("GET Запрос {}", subscriptionDto);
+        return subscriptionDto;
     }
 
     @GetMapping("/black-list")
-    public SubscriptionDto getBlackListSubscriptions(@PathVariable("userId") @Positive long userId) {
-        return subscriptionService.getBlacklists(userId);
+    public SubscriptionDto getBlackListSubscriptions(@PathVariable("userId") @Positive @NotNull long userId) {
+        log.info("GET Запрос на получение черного списка человека с ID {}", userId);
+        SubscriptionDto subscriptionDto = subscriptionService.getBlacklists(userId);
+        log.info("GET Запрос {}", subscriptionDto);
+        return subscriptionDto;
     }
 
     @GetMapping("/subscriptions/events")
-    public List<EventShortResponseDto> getEventsSubscriptions(@PathVariable("userId") @Positive long userId) {
-        return subscriptionService.getEvents(userId);
+    public List<EventShortResponseDto> getEventsSubscriptions(@PathVariable("userId") @Positive @NotNull long userId) {
+        log.info("GET Запрос на получение списка мероприятий пользователей на которых подписан человек с ID {} ", userId);
+        List<EventShortResponseDto> eventShortResponseDtos = subscriptionService.getEvents(userId);
+        log.info("GET Запрос на получение списка мероприятий выполнен {} ", eventShortResponseDtos);
+        return eventShortResponseDtos;
     }
 }
