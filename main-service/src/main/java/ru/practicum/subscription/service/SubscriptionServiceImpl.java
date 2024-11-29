@@ -89,7 +89,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         log.debug("Получение списка ID пользователей на которых подписаны");
         List<Subscriber> subscriptions = subscriberRepository.findAllByUserId(userId);
         log.info("GET Запрос на получение списка подписок пользователя выполнен {}", subscriptions);
-        return subscriptionMapper.SubscribertoSubscriptionDto(subscriptions);
+        return subscriptionMapper.subscribertoSubscriptionDto(subscriptions);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         log.debug("Получение списка ID пользователей на которые в черном списке");
         List<BlackList> blackList = blackListRepository.findAllByUserId(userId);
         log.info("GET Запрос на получение списка черного списка пользователя выполнен {}", blackList);
-        return subscriptionMapper.BlackListSubscriptionDto(blackList);
+        return subscriptionMapper.blackListSubscriptionDto(blackList);
     }
 
     @Override

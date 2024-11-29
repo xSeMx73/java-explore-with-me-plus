@@ -18,7 +18,7 @@ public class SubscriptionMapper {
     private final UserMapper userMapper;
     private final UserAdminService userService;
 
-    public SubscriptionDto SubscribertoSubscriptionDto(List<Subscriber> subscriber) {
+    public SubscriptionDto subscribertoSubscriptionDto(List<Subscriber> subscriber) {
         SubscriptionDto dto = new SubscriptionDto();
         dto.setSubscribers(subscriber.stream()
                 .map(Subscriber::getSubscriber)
@@ -29,7 +29,7 @@ public class SubscriptionMapper {
         return dto;
     }
 
-    public SubscriptionDto BlackListSubscriptionDto(List<BlackList> blackList) {
+    public SubscriptionDto blackListSubscriptionDto(List<BlackList> blackList) {
         SubscriptionDto dto = new SubscriptionDto();
         dto.setBlackList(blackList.stream()
                 .map(BlackList::getBlackList)
