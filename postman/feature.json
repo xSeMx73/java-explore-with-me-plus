@@ -75,7 +75,7 @@
 						},
 						{
 							"key": "subscriberId",
-							"value": "15"
+							"value": "2"
 						}
 					]
 				},
@@ -405,7 +405,7 @@
 			"response": []
 		},
 		{
-			"name": "Запрос на получение списка событий пользователей на которых подписан человек",
+			"name": "Запрос на получение списка мероприятий пользователей на которых подписан человек",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -463,6 +463,58 @@
 				"description": ""
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"async function createUser(email, name) {\r",
+					"    const response = await pm.sendRequest({\r",
+					"        url: pm.environment.get('apiUrl') + '/users',\r",
+					"        method: 'POST',\r",
+					"        header: {\r",
+					"            'Content-Type': 'application/json'\r",
+					"        },\r",
+					"        body: {\r",
+					"            mode: 'raw',\r",
+					"            raw: JSON.stringify({\r",
+					"                email: email,\r",
+					"                name: name\r",
+					"            })\r",
+					"        }\r",
+					"    });\r",
+					"    return response.json();\r",
+					"}\r",
+					"\r",
+					"const users = [\r",
+					"    { email: 'user1@example.com', name: 'User One' },\r",
+					"    { email: 'user2@example.com', name: 'User Two' },\r",
+					"    { email: 'user3@example.com', name: 'User Three' },\r",
+					"    { email: 'user4@example.com', name: 'User Four' }\r",
+					"];\r",
+					"\r",
+					"(async () => {\r",
+					"    for (const user of users) {\r",
+					"        const createdUser = await createUser(user.email, user.name);\r",
+					"        pm.environment.set(`userId_${user.name.split(' ').join('')}`, createdUser.id);\r",
+					"    }\r",
+					"})();"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
