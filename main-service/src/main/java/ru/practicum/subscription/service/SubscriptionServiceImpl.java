@@ -19,6 +19,7 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.userAdmin.UserAdminService;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -51,36 +52,25 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void removeSubscriber(Subscriber subscriber) {
-        log.debug("Проверка пользователя на существование в БД {}", subscriber.getUserId());
-        getUser(subscriber.getUserId(), subscriber.getSubscriber());
-        Optional<Long> subscribed = subscriberRepository.findAllByUserId(subscriber.getUserId()).stream()
-                .map(Subscriber::getSubscriber)
-                .filter(s -> s.equals(subscriber.getSubscriber()))
-                .findFirst();
-
-        if (subscribed.isPresent()) {
+    public void removeSubscriber(Long userId, Long subscriberId) {
+        log.debug("Проверка пользователя на существование в БД {}", userId);
+        getUser(userId, subscriberId);
+        Optional<Subscriber> subscribed = subscriberRepository.findByUserIdAndSubscriber(userId, subscriberId);
+       if (subscribed.isPresent()) {
+           subscriberRepository.delete(subscribed.orElseThrow(() -> new NotFoundException("Пользователя нет в подписчиках")));
             log.info("DELETE Запрос на удаление пользователя из подписок выполнено");
-            subscriberRepository.deleteByUserIdAndSubscriber(subscriber.getUserId(), subscriber.getSubscriber());
-        } else {
-            throw new NotFoundException("Пользователя нет в подписчиках");
         }
     }
 
-    @Override
-    public void removeBlacklist(BlackList blackList) {
-        log.debug("Проверка пользователей на существование в БД {}", blackList.getUserId());
-        getUser(blackList.getUserId(), blackList.getBlackList());
-        Optional<Long> blackLists = blackListRepository.findAllByUserId(blackList.getUserId()).stream()
-                .map(BlackList::getBlackList)
-                .filter(s -> s.equals(blackList.getBlackList()))
-                .findFirst();
 
+    @Override
+    public void removeFromBlackList(long userId, long blackListId) {
+        log.debug("Проверка пользователей на существование в БД {}", userId);
+        getUser(userId,blackListId);
+        Optional<BlackList> blackLists = blackListRepository.findByUserIdAndBlockUser(userId, blackListId);
         if (blackLists.isPresent()) {
+            blackListRepository.delete(blackLists.orElseThrow(() -> new NotFoundException("Пользователя нет в черном листе")));
             log.info("DELETE Запрос на удаление пользователя из черного списка выполнено");
-            blackListRepository.deleteByUserIdAndBlockUser(blackList.getUserId(), blackList.getBlackList());
-        } else {
-            throw new NotFoundException("Пользователя нет в черном листе");
         }
     }
 
@@ -105,6 +95,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriberRepository.findAllByUserId(userId).stream()
                 .map(Subscriber::getSubscriber)
                 .map(eventService::getEventByInitiator)
+                .filter(Objects::nonNull)
                 .filter(event -> event.getState().equals(EventState.PENDING)
                                  || event.getState().equals(EventState.PUBLISHED))
                 .map(listConverter::convert)

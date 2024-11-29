@@ -12,13 +12,13 @@ public interface SubscriptionService {
 
     void addBlacklist(BlackList blackList);
 
-    void removeSubscriber(Subscriber subscriber);
-
-    void removeBlacklist(BlackList blackList);
+    void removeSubscriber(Long userId, Long subscriberId);
 
     SubscriptionDto getSubscribers(long userId);
 
     SubscriptionDto getBlacklists(long userId);
 
     List<EventShortResponseDto> getEvents(long userId);
+
+    void removeFromBlackList(long userId, long blackListId);
 }

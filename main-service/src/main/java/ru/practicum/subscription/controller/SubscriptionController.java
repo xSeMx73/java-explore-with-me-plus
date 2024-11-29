@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class SubscriptionController {
+
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/subscriptions/{subscriberId}")
@@ -53,18 +54,14 @@ public class SubscriptionController {
     public void removeSubscriber(@PathVariable("userId") @Positive @NotNull long userId,
                                  @PathVariable("subscriberId") @Positive @NotNull long subscriberId) {
         log.info("DELETE Запрос на удаление человека из списка подписок >>");
-        Subscriber subscriber = new Subscriber();
-        subscriber.setUserId(userId);
-        subscriber.setSubscriber(subscriberId);
+       subscriptionService.removeSubscriber(userId, subscriberId);
     }
 
     @DeleteMapping("/black-list/{blackListId}")
     public void removeBlackList(@PathVariable("userId") @Positive @NotNull long userId,
                                 @PathVariable("blackListId") @Positive @NotNull long blackListId) {
         log.info("DELETE Запрос на удаление человека из черного списка >>");
-        BlackList blackList = new BlackList();
-        blackList.setUserId(userId);
-        blackList.setBlackList(blackListId);
+        subscriptionService.removeFromBlackList(userId, blackListId);
     }
 
     @GetMapping("/subscriptions")
