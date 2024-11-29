@@ -27,7 +27,7 @@ public class SubscriptionController {
         if (userId == subscriberId) {
             throw new ConditionsNotMetException("Пользователь не может подписаться сам на себя");
         }
-        log.info("POST Запрос на добавление подписки на человека >>");
+        log.info("POST Запрос на добавление подписки на человека  >>");
         Subscriber subscriber = new Subscriber();
         subscriber.setUserId(userId);
         subscriber.setSubscriber(subscriberId);
