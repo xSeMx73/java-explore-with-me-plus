@@ -170,6 +170,11 @@ public class EventServiceImpl implements EventService {
         return requests.stream().map(requestMapper::toRequestDto).collect(Collectors.toList());
     }
 
+    @Override
+    public Event getEventByInitiator(Long userId) {
+        return repository.findByInitiatorId(userId);
+    }
+
     private void processRequestStatus(String status, Event event, Request request,
                                       List<RequestDto> confirmedReqs,
                                       List<RequestDto> canceledReqs) {
